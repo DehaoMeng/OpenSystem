@@ -13,7 +13,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     if (token.value) {
         if (to.name == 'root') {
             if (from.fullPath == '/' && root.value != null){
-                next({name: root.value})
+                next({name: 'index'})
             }else {
                 next(from.fullPath)
             }

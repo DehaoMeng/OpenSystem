@@ -2,8 +2,8 @@ import type {address} from "@/types/response";
 
 export interface teacher {
     id: number
-    jobid: string
-    teahcername: string
+    userid: string
+    username: string
     College: string
     Major: string
     Ip: address
@@ -12,4 +12,5 @@ export interface teacher {
     buddha: string
     sexy: string
     updatatime: string
+    createtime: string
 }

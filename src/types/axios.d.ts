@@ -4,5 +4,5 @@ import type {CustomResponse} from "@/types/response";
 import * as axios from 'axios'
 
 declare module 'axios' {
-    interface AxiosResponse extends CustomResponse{}
+    interface AxiosResponse extends CustomResponse<T>{}
 }

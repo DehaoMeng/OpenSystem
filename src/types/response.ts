@@ -1,4 +1,5 @@
 import type {student} from "@/types/student";
+import type {teacher} from "@/types/teacher";
 
 export interface address {
     country: string | null // 国家
@@ -12,9 +13,9 @@ export interface token {
 }
 
 
-export interface CustomResponse {
+export interface CustomResponse<T>{
     code: number
     msg: string
-    data: token | null | student
+    data: T
 }
 

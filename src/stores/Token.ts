@@ -9,6 +9,10 @@ export const useTokenStore = defineStore('token', () => {
         token.value = localStorage.getItem('token')
         root.value = localStorage.getItem('root')
     }
+    const exit = () => {
+        localStorage.clear()
+        flushToken()
+    }
 
     const setToken = (data: string, manager:string) => {
         localStorage.setItem('token', data)
@@ -16,5 +20,5 @@ export const useTokenStore = defineStore('token', () => {
         flushToken()
     }
     flushToken()
-    return {token, setToken, root}
+    return {token, setToken, root, exit}
 })

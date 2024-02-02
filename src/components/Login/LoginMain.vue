@@ -42,8 +42,7 @@ const onSubmit = () => {
   login(formState.value, manager.value).then((res: AxiosResponse) => {
     if (res.code == 200){
       token.setToken(res.data.token, manager.value)
-      console.log(token)
-      router.push({name: manager.value})  // 跳转到相应页面
+      router.push({name: 'index'})  // 跳转到相应页面
     }else {
       err_msg.value = res.msg
     }

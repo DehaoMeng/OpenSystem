@@ -9,9 +9,22 @@ const router = createRouter({
       component: ()=>import("@/views/HomeView.vue")
     },
     {
-      path: '/student',
-      name: 'student',
-      component: ()=>import("@/views/StudentView.vue")
+      path: '/index',
+      name: 'index',
+      component: ()=>import("@/views/IndexView.vue"),
+      redirect: {name: 'home'},
+      children: [
+        {
+          path: 'home',
+          name: 'home',
+          component: ()=>import("@/views/MessageView.vue")
+        },
+        {
+          path: 'timetable',
+          name: 'timetable',
+          component: () => import("@/views/TimeableView.vue")
+        }
+      ]
     }
   ]
 })

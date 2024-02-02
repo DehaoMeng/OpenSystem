@@ -19,3 +19,18 @@ export const login = (data: LoginData, manager: string) => {
     }
 
 }
+
+
+export const GetMessage = (manager: string) => {
+    if (manager == 'teacher'){
+        return service({
+            url: '/teacher/info',
+            method: 'get'
+        })
+    }else {
+        return service({
+            url: '/student/info',
+            method: 'get'
+        })
+    }
+}

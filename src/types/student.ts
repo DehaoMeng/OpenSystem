@@ -2,8 +2,8 @@ import type {address} from "@/types/response";
 
 export interface student {
     id: number
-    studentid: string
-    studentname: string
+    userid: string
+    username: string
     College: string
     Major: string
     Class: string
@@ -13,4 +13,5 @@ export interface student {
     buddha: string
     sexy: string
     updatatime: string
+    createtime: string
 }

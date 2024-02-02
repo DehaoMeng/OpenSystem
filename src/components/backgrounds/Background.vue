@@ -102,8 +102,8 @@ watch(screenHeight, (val) => {
 onMounted(() => {
   window.onresize = () => {
     return (() => {
-      screenWidth.value = star_content.value!.clientWidth
-      screenHeight.value = star_content.value!.clientHeight
+      screenWidth.value = star_content.value?.clientWidth
+      screenHeight.value = star_content.value?.clientHeight
     })()
   }
   screenWidth.value = star_content.value!.clientWidth
@@ -113,6 +113,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   PauseTimer()
+  window.onresize = () => {
+  }
 });
 </script>
 
@@ -129,9 +131,10 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
 }
-:slotted(div){
+
+:slotted(div) {
   position: absolute;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 99
 }
 </style>
