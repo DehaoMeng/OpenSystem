@@ -9,7 +9,6 @@ const props = defineProps({
   turnover: Boolean
 })
 const {path, width, height, pop} = toRefs(props)
-console.log(pop)
 const img = ref<HTMLImageElement>()
 const pop_img = ref<HTMLImageElement>()
 const targit = ref<HTMLElement>()
