@@ -1,15 +1,13 @@
 <script setup lang="ts">
 
-import {type CSSProperties, onMounted, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 import type {CustomResponse} from "@/types/response";
-import StudentHeader from "@/components/General/Header.vue";
 import {useMessageStore} from "@/stores/Message";
 import {useTokenStore} from "@/stores/Token";
 import type {teacher} from "@/types/teacher";
 import type {student} from "@/types/student";
 import {GetMessage} from "@/request/api";
 import Header from "@/components/General/Header.vue";
-import router from "@/router";
 import {exit} from "@/utils/exit";
 import Slider from "@/components/General/Slider.vue";
 
@@ -17,17 +15,18 @@ const messageStore = useMessageStore()
 const tokenStore = useTokenStore()
 const msg = ref<teacher | student>()
 const name = ref<string>()
-onMounted(() => {
+onBeforeMount(async ()=>{
   if (tokenStore.root) {
-    GetMessage(tokenStore.root).then((res: CustomResponse<teacher | student>) => {
+    await GetMessage(tokenStore.root).then((res: CustomResponse<teacher | student>) => {
       msg.value = res.data
       messageStore.setMessage(msg.value)
       name.value = msg.value.username
-    }).catch(err => {
+    }).catch(() => {
       exit('error', '用户过期', '用户信息已过期，请重新登陆！')
     })
   }
 })
+
 </script>
 
 <template>

@@ -11,13 +11,10 @@ import ImagePoke from "@/components/General/Image-Poke.vue";
 const messageStore = useMessageStore()
 const {message} = storeToRefs(messageStore)
 const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : ref("工号")
-const style = ref({
-  position: 'relative'
-})
 </script>
 <template>
   <div class="box-msg">
-    <a-descriptions title="个人信息" bordered :contentStyle="style">
+    <a-descriptions title="个人信息" bordered >
       <a-descriptions-item :label="label">{{ message?.userid }}</a-descriptions-item>
       <a-descriptions-item label="姓名">{{ message?.username }}</a-descriptions-item>
       <a-descriptions-item label="头像">

@@ -6,6 +6,11 @@ import type {Events} from "@/types/events";
 import {useSchoolStore} from "@/stores/School";
 import Drawer from "@/components/General/Drawer.vue";
 import {exit} from "@/utils/exit";
+import {GetMessage} from "@/request/api";
+import type {CustomResponse} from "@/types/response";
+import type {teacher} from "@/types/teacher";
+import type {student} from "@/types/student";
+import {useMessageStore} from "@/stores/Message";
 
 const props = defineProps(['name'])
 const {name} = toRefs(props)
@@ -15,7 +20,18 @@ const showDrawer = ref<boolean>(false)
 const onOpen = () => {
   showDrawer.value = true
 }
-const onClose = () => {
+const onClose = async () => {
+  console.log('124')
+  if (token.root) {
+    await GetMessage(token.root).then((res: CustomResponse<teacher | student>) => {
+      const msg = ref()
+      const messageStore = useMessageStore()
+      msg.value = res.data
+      messageStore.setMessage(msg.value)
+    }).catch(() => {
+      exit('error', '用户过期', '用户信息已过期，请重新登陆！')
+    })
+  }
   showDrawer.value = false
 }
 const onClick = ({item, key, KeyPath}: Events) => {

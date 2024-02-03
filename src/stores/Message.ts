@@ -13,26 +13,30 @@ export const useMessageStore = defineStore('Message', () => {
     const clear = () => {
         message.value = null
     }
-    const addr = computed(()=>{
-        if (message.value){
-            if (message.value.Ip.country == '中国'){
-                if (message.value.Ip.city){
-                    return message.value.Ip.prov + '省' + message.value.Ip.city+'市'
-                }else {
+    const addr = computed(() => {
+        if (message.value) {
+            if (message.value.Ip.country == '中国') {
+                if (message.value.Ip.city) {
+                    return message.value.Ip.prov + '省' + message.value.Ip.city + '市'
+                } else {
                     return message.value.Ip.prov + '市'
                 }
-            }else {
+            } else {
                 return message.value.Ip.country
             }
 
         }
         return ''
     })
-    const createtime = computed(()=>{
-        return message.value?.createtime.substring(0,10)
+    const createtime = computed(() => {
+        return message.value?.createtime.substring(0, 10)
     })
-    const updatatime = computed(()=>{
-        return message.value?.updatatime.substring(0,19).replace('T', ' ')
+    const updatatime = computed(() => {
+        return message.value?.updatatime.substring(0, 19).replace('T', ' ')
     })
-    return {message, setMessage, clear, addr, createtime, updatatime}
+    const change_sexy = (val: string) => {
+        message.value!.sexy = val
+    }
+
+    return {message, setMessage, clear, addr, createtime, updatatime, change_sexy}
 })
