@@ -9,8 +9,9 @@ import {exit} from "@/utils/exit";
 import {GetMessage} from "@/request/api";
 import type {CustomResponse} from "@/types/response";
 import type {teacher} from "@/types/teacher";
-import type {student} from "@/types/student";
+import type {student, updateStudent} from "@/types/student";
 import {useMessageStore} from "@/stores/Message";
+import {useUpdateMessageStore} from "@/stores/UpdateMessage";
 
 const props = defineProps(['name'])
 const {name} = toRefs(props)
@@ -20,20 +21,16 @@ const showDrawer = ref<boolean>(false)
 const onOpen = () => {
   showDrawer.value = true
 }
-const onClose = async () => {
-  console.log('124')
-  if (token.root) {
-    await GetMessage(token.root).then((res: CustomResponse<teacher | student>) => {
-      const msg = ref()
-      const messageStore = useMessageStore()
-      msg.value = res.data
-      messageStore.setMessage(msg.value)
-    }).catch(() => {
-      exit('error', '用户过期', '用户信息已过期，请重新登陆！')
-    })
-  }
+const onClose = () => {
+  onReset()
   showDrawer.value = false
 }
+const onReset = async () => {
+  const updateMessageStore = useUpdateMessageStore()
+  const messageStore = useMessageStore();
+  await updateMessageStore.update_Message(messageStore.message as updateStudent)
+}
+
 const onClick = ({item, key, KeyPath}: Events) => {
   if (key == '1') {
     showDrawer.value = true
@@ -46,7 +43,7 @@ const onClick = ({item, key, KeyPath}: Events) => {
 <template>
   <a-layout-header>
     <div class="header">
-      <span class="title">{{ school.school_name}}</span>
+      <span class="title">{{ school.school_name }}</span>
       <a-dropdown class="menu-user">
         <a class="ant-dropdown-link" @click.prevent>
           {{ name }}
@@ -54,14 +51,20 @@ const onClick = ({item, key, KeyPath}: Events) => {
         </a>
         <template #overlay>
           <a-menu @click="onClick">
-            <a-menu-item key="1" class="sub-menu"><SettingOutlined/> 管理</a-menu-item>
-            <a-menu-item key="2" class="sub-menu"><CloseOutlined/> 退出</a-menu-item>
+            <a-menu-item key="1" class="sub-menu">
+              <SettingOutlined/>
+              管理
+            </a-menu-item>
+            <a-menu-item key="2" class="sub-menu">
+              <CloseOutlined/>
+              退出
+            </a-menu-item>
           </a-menu>
         </template>
       </a-dropdown>
     </div>
   </a-layout-header>
-  <Drawer :open="showDrawer" :onOpen="onOpen" :onClose="onClose"/>
+  <Drawer :open="showDrawer" @onClose="onClose" @onReset="onReset"/>
 </template>
 
 <style scoped>
@@ -86,7 +89,8 @@ const onClick = ({item, key, KeyPath}: Events) => {
   position: relative;
   left: 42vw;
 }
-.sub-menu{
+
+.sub-menu {
   margin: auto;
   width: 300px;
 }

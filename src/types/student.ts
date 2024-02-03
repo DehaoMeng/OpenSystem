@@ -15,3 +15,6 @@ export interface student {
     updatatime: string
     createtime: string
 }
+export interface updateStudent extends student{
+    password: string
+}

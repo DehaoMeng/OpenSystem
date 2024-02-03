@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import {useMessageStore} from "@/stores/Message";
 import {storeToRefs} from "pinia";
-import type {student} from "@/types/student";
-import type {teacher} from "@/types/teacher";
 import {useTokenStore} from "@/stores/Token";
 import {type Ref, ref} from "vue";
-import type {UploadProps} from "ant-design-vue";
 import ImagePoke from "@/components/General/Image-Poke.vue";
 
 const messageStore = useMessageStore()
 const {message} = storeToRefs(messageStore)
 const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : ref("工号")
+
 </script>
 <template>
   <div class="box-msg">

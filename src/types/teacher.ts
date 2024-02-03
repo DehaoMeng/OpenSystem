@@ -14,3 +14,7 @@ export interface teacher {
     updatatime: string
     createtime: string
 }
+
+export interface updateTeacher extends teacher {
+    password: string
+}

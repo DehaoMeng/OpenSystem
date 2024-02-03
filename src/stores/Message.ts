@@ -5,10 +5,10 @@ import type {teacher} from "@/types/teacher";
 
 export const useMessageStore = defineStore('Message', () => {
 
-    const message = ref<student | teacher | null>()
+    const message = ref<student | null>()
 
-    const setMessage = (data: student | teacher) => {
-        message.value = data
+    const setMessage = (data: student ) => {
+        message.value = JSON.parse(JSON.stringify(data))
     }
     const clear = () => {
         message.value = null
@@ -34,9 +34,7 @@ export const useMessageStore = defineStore('Message', () => {
     const updatatime = computed(() => {
         return message.value?.updatatime.substring(0, 19).replace('T', ' ')
     })
-    const change_sexy = (val: string) => {
-        message.value!.sexy = val
-    }
 
-    return {message, setMessage, clear, addr, createtime, updatatime, change_sexy}
+
+    return {message, setMessage, clear, addr, createtime, updatatime}
 })

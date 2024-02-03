@@ -1,5 +1,7 @@
 import service from "@/request/index";
 import type {LoginData} from "@/types/request";
+import type {updateStudent} from "@/types/student";
+import type {updateTeacher} from "@/types/teacher";
 
 export const login = (data: LoginData, manager: string) => {
     if (manager == 'teacher') {
@@ -22,15 +24,32 @@ export const login = (data: LoginData, manager: string) => {
 
 
 export const GetMessage = async (manager: string) => {
-    if (manager == 'teacher'){
+    if (manager == 'teacher') {
         return service({
             url: '/teacher/info',
             method: 'get'
         })
-    }else {
+    } else {
         return service({
             url: '/student/info',
             method: 'get'
+        })
+    }
+}
+
+
+export const UpdateMessage = async (manager: string, data: updateStudent | updateTeacher) => {
+    if (manager == 'teacher') {
+        return service({
+            url: '/teacher/info',
+            method: 'post',
+            data
+        })
+    } else {
+        return service({
+            url: '/student/info',
+            method: 'post',
+            data
         })
     }
 }

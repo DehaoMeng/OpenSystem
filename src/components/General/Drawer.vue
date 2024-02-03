@@ -1,21 +1,81 @@
 <!-- TODO-->
 <script lang="ts" setup>
-import {computed, reactive, type Ref, ref, onBeforeUnmount} from 'vue';
-import {PlusOutlined} from '@ant-design/icons-vue';
-import type {Rule} from 'ant-design-vue/es/form';
+import {type Ref, ref} from 'vue';
 import {useMessageStore} from "@/stores/Message";
 import {useTokenStore} from "@/stores/Token";
-import {storeToRefs} from "pinia";
-import {GetMessage} from "@/request/api";
-import type {CustomResponse} from "@/types/response";
+import {useUpdateMessageStore} from "@/stores/UpdateMessage";
+import {PlusOutlined} from '@ant-design/icons-vue';
+import type {UploadProps} from 'ant-design-vue';
+import {UpdateMessage} from "@/request/api";
+import type {student, updateStudent} from "@/types/student";
 import type {teacher} from "@/types/teacher";
-import type {student} from "@/types/student";
-import {exit} from "@/utils/exit";
 
-defineProps(['open', 'onOpen', 'onClose'])
-
+defineProps(['open'])
+const Emits = defineEmits(['onClose', 'onReset'])
 const messageStore = useMessageStore();
 const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : ref("工号")
+const updateMessageStore = useUpdateMessageStore()
+const err_msg = ref('')
+const check = () => {
+  if (updateMessageStore.updateMessage?.phone.length != 0 && updateMessageStore.updateMessage?.phone.length != 11) {
+    err_msg.value = '当前手机号格式不匹配 请重新输入'
+  } else {
+    err_msg.value = ''
+  }
+}
+const Close = () => {
+  err_msg.value = ''
+  Emits('onClose')
+}
+const reSet = ()=>{
+  Emits('onReset')
+}
+function getBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+const previewVisible = ref(false);
+const previewImage = ref('');
+const previewTitle = ref('');
+
+const fileList = ref<UploadProps['fileList']>([]);
+
+const handleCancel = () => {
+  previewVisible.value = false;
+  previewTitle.value = '';
+};
+const handlePreview = async (file: any) => {
+  if (!file.url && !file.preview) {
+    file.preview = (await getBase64(file.originFileObj)) as string;
+  }
+  previewImage.value = file.url || file.preview;
+  previewVisible.value = true;
+  previewTitle.value = messageStore.message!.username
+};
+const headerObj = ref({
+  Authorization: localStorage.getItem("token"),
+})
+const uploadOnChange = (info: any) => {
+  let response = info.file.response
+  if (response) {
+    updateMessageStore.updateMessage!.buddha = response.data.buddha
+  }
+}
+
+const Submit = () => {
+  const tokenStore = useTokenStore()
+  if (tokenStore.root){
+    UpdateMessage(tokenStore.root, updateMessageStore.updateMessage as updateStudent).then(res=>{
+      messageStore.setMessage(res.data as student)
+    })
+  }
+  Emits('onClose')
+}
 </script>
 
 
@@ -26,7 +86,7 @@ const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : r
       :open="open"
       :body-style="{ paddingBottom: '80px' }"
       :footer-style="{ textAlign: 'right' }"
-      @close="onClose"
+      @close="Close"
   >
     <a-form :model="messageStore.message" layout="vertical">
       <a-row :gutter="16">
@@ -66,7 +126,7 @@ const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : r
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="性别" name="sexy">
-            <a-select :value="messageStore.message!.sexy" @change="messageStore.change_sexy">
+            <a-select :value="updateMessageStore.updateMessage!.sexy" @change="updateMessageStore.change_sexy">
               <a-select-option value="男" lable="男"></a-select-option>
               <a-select-option value="女" lable="女"></a-select-option>
             </a-select>
@@ -74,35 +134,66 @@ const label: Ref<string> = useTokenStore().root == "student" ? ref("学号") : r
         </a-col>
         <a-col :span="12">
           <a-form-item label="住址" name="addrss">
-            <a-input type="text" v-model:value="messageStore.message!.addr" ></a-input>
+            <a-input type="text" v-model:value="updateMessageStore.updateMessage!.addr"></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="DateTime" name="dateTime">
-            <a-date-picker
-
-                style="width: 100%"
-            />
+          <a-form-item label="联系方式" name="phone">
+            <a-input type="text" v-model:value="updateMessageStore.updateMessage!.phone" @focusout="check"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item name="err">
+            <br/>
+            <br/>
+            {{ err_msg }}
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="16">
         <a-col :span="24">
-          <a-form-item label="Description" name="description">
-            <a-textarea
-                :rows="4"
-                placeholder="please enter url description"
-            />
+          <a-form-item name="buddha" label="头像">
+            <div class="clearfix">
+              <a-upload
+                  v-model:file-list="fileList"
+                  action="http://localhost:8000/upload-img"
+                  list-type="picture-card"
+                  @preview="handlePreview"
+                  :headers="headerObj"
+                  @change="uploadOnChange"
+              >
+                <div v-if="fileList!.length < 1">
+                  <plus-outlined/>
+                  <div style="margin-top: 8px">上传</div>
+                </div>
+              </a-upload>
+              <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
+                <img alt="example" style="width: 100%" :src="previewImage"/>
+              </a-modal>
+            </div>
           </a-form-item>
         </a-col>
       </a-row>
     </a-form>
     <template #extra>
       <a-space>
-        <a-button >Cancel</a-button>
-        <a-button type="primary">Submit</a-button>
+        <a-button @click="Close">取消</a-button>
+        <a-button @click="reSet">重置</a-button>
+        <a-button type="primary" @click="Submit">提交</a-button>
       </a-space>
     </template>
   </a-drawer>
 </template>
 
+<style scoped>
+/* you can make up upload button and sample style by using stylesheets */
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
+</style>
