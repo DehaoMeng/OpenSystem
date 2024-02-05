@@ -2,6 +2,7 @@ import service from "@/request/index";
 import type {LoginData} from "@/types/request";
 import type {updateStudent} from "@/types/student";
 import type {updateTeacher} from "@/types/teacher";
+import type {paginate} from "@/types/axios";
 
 export const login = (data: LoginData, manager: string) => {
     if (manager == 'teacher') {
@@ -52,4 +53,14 @@ export const UpdateMessage = async (manager: string, data: updateStudent | updat
             data
         })
     }
+}
+
+
+// 学生查看选课信息
+export const CourseInfo = async (data: paginate) => {
+    return service({
+        url: 'course/course',
+        method: "get",
+        params: data
+    })
 }

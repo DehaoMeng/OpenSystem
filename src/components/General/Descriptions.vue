@@ -3,7 +3,7 @@ import {useMessageStore} from "@/stores/Message";
 import {storeToRefs} from "pinia";
 import {useTokenStore} from "@/stores/Token";
 import {type Ref, ref} from "vue";
-import ImagePoke from "@/components/General/Image-Poke.vue";
+import ImagePoke from "@/components/backgrounds/Image-Poke.vue";
 
 const messageStore = useMessageStore()
 const {message} = storeToRefs(messageStore)

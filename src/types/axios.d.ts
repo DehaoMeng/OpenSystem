@@ -6,3 +6,8 @@ import * as axios from 'axios'
 declare module 'axios' {
     interface AxiosResponse extends CustomResponse<T>{}
 }
+
+export interface paginate{
+    page: number
+    size: number | null
+}

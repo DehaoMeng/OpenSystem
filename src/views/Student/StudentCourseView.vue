@@ -1,11 +1,10 @@
 <script setup lang="ts">
 
+import CourseTable from "@/components/Student/CourseTable.vue";
 </script>
 
 <template>
-<div>
-  12311231
-</div>
+<CourseTable/>
 </template>
 
 <style scoped>

@@ -14,8 +14,7 @@ import {
 import type {MenuProps, ItemType} from 'ant-design-vue';
 import router from "@/router";
 import {useTokenStore} from "@/stores/Token";
-
-const selectedKeys = ref<string[]>(['home']);
+const selectedKeys = ref<string[]>([router.currentRoute.value.name as string]);
 const collapsed = ref<boolean>(true);
 
 function getItem(

@@ -4,12 +4,9 @@ import {HeartTwoTone, SettingOutlined, CloseOutlined} from "@ant-design/icons-vu
 import {useTokenStore} from "@/stores/Token";
 import type {Events} from "@/types/events";
 import {useSchoolStore} from "@/stores/School";
-import Drawer from "@/components/General/Drawer.vue";
+import MessageDrawer from "@/components/General/MessageDrawer.vue";
 import {exit} from "@/utils/exit";
-import {GetMessage} from "@/request/api";
-import type {CustomResponse} from "@/types/response";
-import type {teacher} from "@/types/teacher";
-import type {student, updateStudent} from "@/types/student";
+import type { updateStudent} from "@/types/student";
 import {useMessageStore} from "@/stores/Message";
 import {useUpdateMessageStore} from "@/stores/UpdateMessage";
 
@@ -64,7 +61,7 @@ const onClick = ({item, key, KeyPath}: Events) => {
       </a-dropdown>
     </div>
   </a-layout-header>
-  <Drawer :open="showDrawer" @onClose="onClose" @onReset="onReset"/>
+  <MessageDrawer :open="showDrawer" @onClose="onClose" @onReset="onReset"/>
 </template>
 
 <style scoped>
