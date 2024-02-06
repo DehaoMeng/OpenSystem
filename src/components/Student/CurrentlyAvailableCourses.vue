@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import type {TableColumnsType} from "ant-design-vue";
 import {CourseInfo} from "@/request/api";
 import type {paginate} from "@/types/axios";
@@ -10,7 +10,8 @@ import {GetCourseID} from "@/utils/course";
 
 const courseStore = useCourseStore();
 const current_page = ref(1)
-
+const courseid = ref()
+const coursename = ref()
 const func = async () => {
   await CourseInfo({page: current_page.value, size: courseStore.size} as paginate).then((res) => {
     courseStore.record_nums(res.num as number)
@@ -47,6 +48,24 @@ const onChange = (page: number) => {
 const onClick = (data: any) => {
   console.log(data)
 }
+const filter_id = computed(() =>
+    courseStore.courseData.filter(
+        (data: course) =>
+            !courseid.value ||
+            data.courseid!.toLowerCase().includes(courseid.value.toLowerCase())
+    )
+)
+
+const filterTableData = computed(() => {
+  if (courseid.value || coursename.value) {
+    return filter_id.value.filter(
+        (data: course) =>
+          !coursename.value ||
+            data.coursename.toLowerCase().includes(coursename.value.toLowerCase())
+    )
+  }
+  return courseStore.getPageData(current_page.value)
+})
 
 onMounted(() => onChange(current_page.value))
 
@@ -56,19 +75,22 @@ onMounted(() => onChange(current_page.value))
   <div class="main">
     <a-row :gutter="[16,16]">
       <a-col :span="4">
-        <a-input placeholder="请输入课程号" addonBefore="课程号"></a-input>
+        <a-input placeholder="请输入课程号" addonBefore="课程号" v-model:value="courseid"></a-input>
       </a-col>
       <a-col :span="5">
-        <a-input placeholder="请输入课程名称" addonBefore="课程名称"></a-input>
+        <a-input placeholder="请输入课程名称" addonBefore="课程名称" v-model:value="coursename"></a-input>
+      </a-col>
+      <a-col :span="5">
+        <a-input placeholder="该搜索仅可搜索访问过的数据"  :bordered="false" disabled style="cursor: default"></a-input>
       </a-col>
     </a-row>
-    <a-table :columns="columns" :data-source="courseStore.getPageData(current_page)" :scroll="{ x: 1500, y: 500 }"
+    <a-table :columns="columns" :data-source="filterTableData" :scroll="{ x: 1500, y: 500 }"
              :pagination="false" style="margin: 10px 0">
-        <template #bodyCell="{record,column}">
-          <template v-if="column.key == 'selected'">
-            <a-button @click="onClick(record)">{{ record.selected? "退课":"选课" }}</a-button>
-          </template>
+      <template #bodyCell="{record,column}">
+        <template v-if="column.key == 'selected'">
+          <a-button @click="onClick(record)">{{ record.selected ? "退课" : "选课" }}</a-button>
         </template>
+      </template>
     </a-table>
     <a-pagination
         v-model:current="current_page"

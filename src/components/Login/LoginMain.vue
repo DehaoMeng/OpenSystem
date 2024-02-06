@@ -73,6 +73,8 @@ const onSubmit = () => {
         <a-input v-model:value="formState.id"
                  placeholder="请输入学号/工号"
                  :onfocus="onFocus"
+                 allow-clear
+                 style="width: 60%;"
         />
       </a-form-item>
 
@@ -86,6 +88,7 @@ const onSubmit = () => {
                           autocomplete="off"
                           placeholder="请输入密码"
                           :onfocus="onFocus"
+                          allow-clear
         />
       </a-form-item>
 
@@ -138,7 +141,7 @@ const onSubmit = () => {
   width: 80%;
 }
 :deep(.ant-input){
-  width: 60%;
+  width: 100%;
 }
 :deep(.ant-input-password){
   width: 60%;
