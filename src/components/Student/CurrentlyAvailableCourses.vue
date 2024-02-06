@@ -1,25 +1,27 @@
 <script setup lang="ts">
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import type {TableColumnsType} from "ant-design-vue";
 import {CourseInfo} from "@/request/api";
 import type {paginate} from "@/types/axios";
 import type {course} from "@/types/course";
 import {useCourseStore} from "@/stores/Course";
-import {assignWith} from "lodash-es";
-import {GetCourseID} from "@/utils/course";
 
 const courseStore = useCourseStore();
 const current_page = ref(1)
 const courseid = ref()
 const coursename = ref()
-const func = async () => {
-  await CourseInfo({page: current_page.value, size: courseStore.size} as paginate).then((res) => {
-    courseStore.record_nums(res.num as number)
+const global_search = ref(false)
+const title = ref('该搜索仅可搜索访问过的数据')
+const func =  (page:number) => {
+   CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
+    if (current_page.value == 1){
+      courseStore.record_nums(res.num as number)
+    }
     for (let i = 0; i < res.data.length; i++) {
       courseStore.addData(JSON.parse(JSON.stringify(res.data[i])))
     }
   })
-  courseStore.loading_pages.push(current_page.value)
+  courseStore.loading_pages.push(page)
 }
 
 const columns: TableColumnsType = [
@@ -41,7 +43,7 @@ const columns: TableColumnsType = [
 const onChange = (page: number) => {
   // 切换页面
   if (courseStore.loading_pages.indexOf(page) == -1) {
-    func()
+     func(page)
   }
 }
 
@@ -52,19 +54,30 @@ const filter_id = computed(() =>
     courseStore.courseData.filter(
         (data: course) =>
             !courseid.value ||
-            data.courseid!.toLowerCase().includes(courseid.value.toLowerCase())
+            data.courseid.toString().toLowerCase().includes(courseid.value.toLowerCase())
     )
 )
-
+// TODO 搜索后无法正确分页了
 const filterTableData = computed(() => {
   if (courseid.value || coursename.value) {
     return filter_id.value.filter(
         (data: course) =>
           !coursename.value ||
             data.coursename.toLowerCase().includes(coursename.value.toLowerCase())
-    )
+    ).slice((current_page.value-1) * courseStore.size)
   }
   return courseStore.getPageData(current_page.value)
+})
+
+watch(global_search,  (val)=>{
+  if (val){
+    for (let i = 1; i <= courseStore.nums; i++) {
+      onChange(i)
+    }
+    title.value= '已开启全局搜索，已为您加载全部数据'
+  }else {
+    title.value = '该搜索仅可搜索访问过的数据'
+  }
 })
 
 onMounted(() => onChange(current_page.value))
@@ -80,8 +93,11 @@ onMounted(() => onChange(current_page.value))
       <a-col :span="5">
         <a-input placeholder="请输入课程名称" addonBefore="课程名称" v-model:value="coursename"></a-input>
       </a-col>
+      <a-col :span="1" style="margin: 3px 0">
+        <a-switch v-model:checked="global_search"/>
+      </a-col>
       <a-col :span="5">
-        <a-input placeholder="该搜索仅可搜索访问过的数据"  :bordered="false" disabled style="cursor: default"></a-input>
+        <a-input :placeholder="title"  :bordered="false" disabled style="cursor: default"></a-input>
       </a-col>
     </a-row>
     <a-table :columns="columns" :data-source="filterTableData" :scroll="{ x: 1500, y: 500 }"
@@ -99,7 +115,7 @@ onMounted(() => onChange(current_page.value))
         :default-page-size="courseStore.size"
         show-less-items
         hideOnSinglePage
-        @change="onChange"
+        @change="onChange(current_page)"
     />
   </div>
 
