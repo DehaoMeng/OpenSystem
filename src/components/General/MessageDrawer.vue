@@ -5,10 +5,9 @@ import {useMessageStore} from "@/stores/Message";
 import {useTokenStore} from "@/stores/Token";
 import {useUpdateMessageStore} from "@/stores/UpdateMessage";
 import {PlusOutlined} from '@ant-design/icons-vue';
-import type {UploadProps} from 'ant-design-vue';
+import {message, type UploadProps} from 'ant-design-vue';
 import {UpdateMessage} from "@/request/api";
 import type {student, updateStudent} from "@/types/student";
-import type {teacher} from "@/types/teacher";
 
 defineProps(['open'])
 const Emits = defineEmits(['onClose', 'onReset'])
@@ -27,9 +26,10 @@ const Close = () => {
   err_msg.value = ''
   Emits('onClose')
 }
-const reSet = ()=>{
+const reSet = () => {
   Emits('onReset')
 }
+
 function getBase64(file: File) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -69,13 +69,19 @@ const uploadOnChange = (info: any) => {
 
 const Submit = () => {
   const tokenStore = useTokenStore()
-  if (tokenStore.root){
-    UpdateMessage(tokenStore.root, updateMessageStore.updateMessage as updateStudent).then(res=>{
+  if (tokenStore.root && updateMessageStore.diff(messageStore!.message as student) || warning()) {
+    UpdateMessage(tokenStore.root as string, updateMessageStore.updateMessage as updateStudent).then(res => {
       messageStore.setMessage(res.data as student)
+      updateMessageStore.update_Message(JSON.parse(JSON.stringify(res.data)) as updateStudent)
     })
   }
   Emits('onClose')
 }
+
+const warning = () => {
+  message.warning('本次提交无修改信息!');
+  return false
+};
 </script>
 
 

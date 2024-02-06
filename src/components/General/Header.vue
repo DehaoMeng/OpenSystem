@@ -19,7 +19,6 @@ const onOpen = () => {
   showDrawer.value = true
 }
 const onClose = () => {
-  onReset()
   showDrawer.value = false
 }
 const onReset = async () => {
