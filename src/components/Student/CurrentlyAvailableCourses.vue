@@ -12,11 +12,12 @@ const courseid = ref()
 const coursename = ref()
 const global_search = ref(false)
 const title = ref('该搜索仅可搜索访问过的数据')
-const func =  (page:number) => {
-   CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
-    if (current_page.value == 1){
-      courseStore.record_nums(res.num as number)
-    }
+const getPopupContainer = (trigger: HTMLElement) => {
+  return trigger.parentElement;
+}
+const func = (page: number) => {
+  CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
+    courseStore.record_nums(res.num as number)
     for (let i = 0; i < res.data.length; i++) {
       courseStore.addData(JSON.parse(JSON.stringify(res.data[i])))
     }
@@ -43,7 +44,7 @@ const columns: TableColumnsType = [
 const onChange = (page: number) => {
   // 切换页面
   if (courseStore.loading_pages.indexOf(page) == -1) {
-     func(page)
+    func(page)
   }
 }
 
@@ -60,22 +61,25 @@ const filter_id = computed(() =>
 // TODO 搜索后无法正确分页了
 const filterTableData = computed(() => {
   if (courseid.value || coursename.value) {
-    return filter_id.value.filter(
+    let data = filter_id.value.filter(
         (data: course) =>
-          !coursename.value ||
+            !coursename.value ||
             data.coursename.toLowerCase().includes(coursename.value.toLowerCase())
-    ).slice((current_page.value-1) * courseStore.size)
+    ).slice((current_page.value - 1) * courseStore.size)
+    courseStore.record_nums(data.length/courseStore.size)
+    return data
   }
+
   return courseStore.getPageData(current_page.value)
 })
 
-watch(global_search,  (val)=>{
-  if (val){
+watch(global_search, (val) => {
+  if (val) {
     for (let i = 1; i <= courseStore.nums; i++) {
       onChange(i)
     }
-    title.value= '已开启全局搜索，已为您加载全部数据'
-  }else {
+    title.value = '已开启全局搜索，已为您加载全部数据'
+  } else {
     title.value = '该搜索仅可搜索访问过的数据'
   }
 })
@@ -94,10 +98,12 @@ onMounted(() => onChange(current_page.value))
         <a-input placeholder="请输入课程名称" addonBefore="课程名称" v-model:value="coursename"></a-input>
       </a-col>
       <a-col :span="1" style="margin: 3px 0">
-        <a-switch v-model:checked="global_search"/>
+        <a-tooltip placement="bottom" title="开启全局搜索会自动加载所有数据,可能会有所卡顿" >
+          <a-switch v-model:checked="global_search"/>
+        </a-tooltip>
       </a-col>
       <a-col :span="5">
-        <a-input :placeholder="title"  :bordered="false" disabled style="cursor: default"></a-input>
+        <a-input :placeholder="title" :bordered="false" disabled style="cursor: default"></a-input>
       </a-col>
     </a-row>
     <a-table :columns="columns" :data-source="filterTableData" :scroll="{ x: 1500, y: 500 }"
@@ -117,6 +123,7 @@ onMounted(() => onChange(current_page.value))
         hideOnSinglePage
         @change="onChange(current_page)"
     />
+    <!--  total_nums 在搜索功能下也应该发生改变   -->
   </div>
 
 </template>

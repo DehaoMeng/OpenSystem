@@ -15,7 +15,7 @@ export const useCourseStore = defineStore('Course', () => {
     }
 
     const getPageData = (target_page: number) => {
-        return courseData.value.slice((target_page - 1) * size.value, target_page * size.value -1)
+        return courseData.value.slice((target_page - 1) * size.value, target_page * size.value)
     }
 
     const record_nums = (num: number) => {
@@ -25,7 +25,6 @@ export const useCourseStore = defineStore('Course', () => {
     const total_nums = computed(() => {
         return nums.value * size.value
     })
-
 
     return {courseData, addData, size, getPageData, loading_pages, total_nums, record_nums, nums}
 })

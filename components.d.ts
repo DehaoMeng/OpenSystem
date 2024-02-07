@@ -38,6 +38,7 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     ATableColumn: typeof import('ant-design-vue/es')['TableColumn']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
+    ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATypographyLink: typeof import('ant-design-vue/es')['TypographyLink']
     AUpload: typeof import('ant-design-vue/es')['Upload']
     Background: typeof import('./src/components/backgrounds/Background.vue')['default']
