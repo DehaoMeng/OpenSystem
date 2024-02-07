@@ -17,7 +17,7 @@ const getPopupContainer = (trigger: HTMLElement) => {
 }
 const func = (page: number) => {
   CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
-    courseStore.record_nums(res.num as number)
+    courseStore.record_nums(res.num as number, res.num as number)
     for (let i = 0; i < res.data.length; i++) {
       courseStore.addData(JSON.parse(JSON.stringify(res.data[i])))
     }
@@ -66,10 +66,11 @@ const filterTableData = computed(() => {
             !coursename.value ||
             data.coursename.toLowerCase().includes(coursename.value.toLowerCase())
     ).slice((current_page.value - 1) * courseStore.size)
-    courseStore.record_nums(data.length/courseStore.size)
+    courseStore.record_nums(data.length / courseStore.size)
+
     return data
   }
-
+  courseStore.clear_filter()
   return courseStore.getPageData(current_page.value)
 })
 
@@ -98,7 +99,9 @@ onMounted(() => onChange(current_page.value))
         <a-input placeholder="请输入课程名称" addonBefore="课程名称" v-model:value="coursename"></a-input>
       </a-col>
       <a-col :span="1" style="margin: 3px 0">
-        <a-tooltip placement="bottom" title="开启全局搜索会自动加载所有数据,可能会有所卡顿" >
+        <a-tooltip placement="bottom"
+                   title="开启全局搜索会自动加载所有数据,可能会有所卡顿(已访问所有课程内容后，无需开启)"
+                   color='#2db7f5'>
           <a-switch v-model:checked="global_search"/>
         </a-tooltip>
       </a-col>
@@ -123,7 +126,6 @@ onMounted(() => onChange(current_page.value))
         hideOnSinglePage
         @change="onChange(current_page)"
     />
-    <!--  total_nums 在搜索功能下也应该发生改变   -->
   </div>
 
 </template>
