@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref, watch} from "vue";
-import type {TableColumnsType} from "ant-design-vue";
-import {CourseInfo} from "@/request/api";
+import {message, type TableColumnsType} from "ant-design-vue";
+import {CourseInfo, CurriculaVariable} from "@/request/api";
 import type {paginate} from "@/types/axios";
 import type {course} from "@/types/course";
 import {useCourseStore} from "@/stores/Course";
@@ -12,15 +12,17 @@ const courseid = ref()
 const coursename = ref()
 const global_search = ref(false)
 const title = ref('该搜索仅可搜索访问过的数据')
-const getPopupContainer = (trigger: HTMLElement) => {
-  return trigger.parentElement;
-}
 const func = (page: number) => {
   CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
     courseStore.record_nums(res.num as number, res.num as number)
+    console.log(res)
     for (let i = 0; i < res.data.length; i++) {
       courseStore.addData(JSON.parse(JSON.stringify(res.data[i])))
     }
+  }).catch(err=>{
+    if (err == '')
+    error()
+    func(current_page.value)
   })
   courseStore.loading_pages.push(page)
 }
@@ -47,10 +49,14 @@ const onChange = (page: number) => {
     func(page)
   }
 }
+// 点击退选课
+const onClick = async (data: course) => {
+  await CurriculaVariable({id: data.id, selected: data.selected}).then(res=>{
+    data.selected = !data.selected
+  })
 
-const onClick = (data: any) => {
-  console.log(data)
 }
+// 使用id搜索数据
 const filter_id = computed(() =>
     courseStore.courseData.filter(
         (data: course) =>
@@ -58,7 +64,7 @@ const filter_id = computed(() =>
             data.courseid.toString().toLowerCase().includes(courseid.value.toLowerCase())
     )
 )
-// TODO 搜索后无法正确分页了
+// 搜索后的结果数据
 const filterTableData = computed(() => {
   if (courseid.value || coursename.value) {
     let data = filter_id.value.filter(
@@ -67,13 +73,12 @@ const filterTableData = computed(() => {
             data.coursename.toLowerCase().includes(coursename.value.toLowerCase())
     ).slice((current_page.value - 1) * courseStore.size)
     courseStore.record_nums(data.length / courseStore.size)
-
     return data
   }
   courseStore.clear_filter()
   return courseStore.getPageData(current_page.value)
 })
-
+// 监视是否开启全局搜索功能
 watch(global_search, (val) => {
   if (val) {
     for (let i = 1; i <= courseStore.nums; i++) {
@@ -84,7 +89,9 @@ watch(global_search, (val) => {
     title.value = '该搜索仅可搜索访问过的数据'
   }
 })
-
+const error = () => {
+  message.error('NetWork Error 请稍等一下');
+};
 onMounted(() => onChange(current_page.value))
 
 </script>
@@ -93,10 +100,15 @@ onMounted(() => onChange(current_page.value))
   <div class="main">
     <a-row :gutter="[16,16]">
       <a-col :span="4">
-        <a-input placeholder="请输入课程号" addonBefore="课程号" v-model:value="courseid"></a-input>
+        <a-input placeholder="请输入课程号"
+                 addonBefore="课程号"
+                 allow-clear
+                 v-model:value="courseid"/>
       </a-col>
       <a-col :span="5">
-        <a-input placeholder="请输入课程名称" addonBefore="课程名称" v-model:value="coursename"></a-input>
+        <a-input placeholder="请输入课程名称"
+                 addonBefore="课程名称"
+                 v-model:value="coursename"/>
       </a-col>
       <a-col :span="1" style="margin: 3px 0">
         <a-tooltip placement="bottom"
@@ -106,14 +118,21 @@ onMounted(() => onChange(current_page.value))
         </a-tooltip>
       </a-col>
       <a-col :span="5">
-        <a-input :placeholder="title" :bordered="false" disabled style="cursor: default"></a-input>
+        <a-input :placeholder="title"
+                 :bordered="false"
+                 style="cursor: default"
+                 disabled/>
       </a-col>
     </a-row>
-    <a-table :columns="columns" :data-source="filterTableData" :scroll="{ x: 1500, y: 500 }"
+    <a-table :columns="columns"
+             :data-source="filterTableData"
+             :scroll="{ x: 1500, y: 500 }"
              :pagination="false" style="margin: 10px 0">
       <template #bodyCell="{record,column}">
         <template v-if="column.key == 'selected'">
-          <a-button @click="onClick(record)">{{ record.selected ? "退课" : "选课" }}</a-button>
+          <a-button @click="onClick(record)">
+            {{ record.selected ? "退课" : "选课" }}
+          </a-button>
         </template>
       </template>
     </a-table>

@@ -8,6 +8,6 @@ export interface course {
     endtime: string
     course: number
     teacher: number
-    selected: number
+    selected: boolean
     courseid: string | number
 }

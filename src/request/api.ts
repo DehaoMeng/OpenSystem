@@ -64,3 +64,13 @@ export const CourseInfo = async (data: paginate) => {
         params: data
     })
 }
+
+
+export const CurriculaVariable = async (data: { id: number, selected: boolean }) => {
+    return service({
+        url: 'course/student-course',
+        method: "post",
+        data
+    })
+}
+
