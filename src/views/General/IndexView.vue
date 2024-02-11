@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeMount, ref} from "vue";
 import type {CustomResponse} from "@/types/response";
 import {useMessageStore} from "@/stores/Message";
 import {useTokenStore} from "@/stores/Token";
@@ -17,7 +17,7 @@ const messageStore = useMessageStore()
 const updateMessageStore = useUpdateMessageStore()
 const tokenStore = useTokenStore()
 const name = ref<string>()
-onBeforeMount(async ()=>{
+onBeforeMount(async () => {
   if (tokenStore.root) {
     await GetMessage(tokenStore.root).then((res: CustomResponse<teacher | student>) => {
       messageStore.setMessage(res.data as student)
@@ -35,7 +35,7 @@ onBeforeMount(async ()=>{
   <a-layout>
     <Header :name="name"/>
     <a-layout :has-sider="true" class="main-layout" :style="{ overflow: 'auto', height: '92vh'}">
-        <Slider/>
+      <Slider/>
       <a-layout-content>
         <RouterView/>
       </a-layout-content>

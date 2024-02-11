@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
+import {error} from "@/utils/GlobalPrompt"
 import type {LoginData} from "@/types/request";
 import {login} from "@/request/api"
 import {useTokenStore} from "@/stores/Token";
@@ -25,7 +26,7 @@ const onSubmit = () => {
   pwd_err.value = ''
   if (formState.value.id === '' || formState.value.id.length !== 10) {
     id_err.value = '用户名格式不正确'
-    console.log(id_err.value)
+    error(id_err.value)
     return
   }
   if (formState.value.password === '' ||
@@ -47,7 +48,7 @@ const onSubmit = () => {
       err_msg.value = res.msg
     }
   }).catch(err => {
-    console.log(err.msg)
+    error(err.msg)
   })
 
 }

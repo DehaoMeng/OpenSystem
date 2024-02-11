@@ -27,7 +27,6 @@ service.interceptors.response.use((res: AxiosResponse) => {
     }
     return res.data
 }, (err: AxiosError) => {
-    console.log(err)
     return err.message
 })
 

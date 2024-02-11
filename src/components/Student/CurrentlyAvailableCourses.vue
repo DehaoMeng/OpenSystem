@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {computed, onMounted, ref, watch} from "vue";
-import {message, type TableColumnsType} from "ant-design-vue";
+import {type TableColumnsType} from "ant-design-vue";
 import {CourseInfo, CurriculaVariable} from "@/request/api";
 import type {paginate} from "@/types/axios";
 import type {course} from "@/types/course";
 import {useCourseStore} from "@/stores/Course";
+import {error} from "@/utils/GlobalPrompt";
 
 const courseStore = useCourseStore();
 const current_page = ref(1)
@@ -15,13 +16,12 @@ const title = ref('该搜索仅可搜索访问过的数据')
 const func = (page: number) => {
   CourseInfo({page: page, size: courseStore.size} as paginate).then((res) => {
     courseStore.record_nums(res.num as number, res.num as number)
-    console.log(res)
     for (let i = 0; i < res.data.length; i++) {
       courseStore.addData(JSON.parse(JSON.stringify(res.data[i])))
     }
-  }).catch(err=>{
+  }).catch(err => {
     if (err == '')
-    error()
+      error('NetWork Error 请稍等一下')
     func(current_page.value)
   })
   courseStore.loading_pages.push(page)
@@ -51,7 +51,7 @@ const onChange = (page: number) => {
 }
 // 点击退选课
 const onClick = async (data: course) => {
-  await CurriculaVariable({id: data.id, selected: data.selected}).then(()=>{
+  await CurriculaVariable({id: data.id, selected: data.selected}).then(() => {
     data.selected = !data.selected
   })
 
@@ -89,9 +89,6 @@ watch(global_search, (val) => {
     title.value = '该搜索仅可搜索访问过的数据'
   }
 })
-const error = () => {
-  message.error('NetWork Error 请稍等一下');
-};
 onMounted(() => onChange(current_page.value))
 
 </script>
