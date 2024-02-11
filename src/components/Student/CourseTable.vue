@@ -21,14 +21,14 @@ const Get = () => {
   })
 }
 const init = () => {
-  const currentMonth = new Date().getMonth()
-
+  const currentMonth = 1
+  // const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
   let semester
-  if (currentMonth <= 5 && currentMonth >= 1) { // 本年7月到12月 代表本学年第一学期
-    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '1'
-  } else if (currentMonth <= 11 && currentMonth >= 6) {  // 本年7月到12月 代表本学年第二学期
+  if (currentMonth <= 11 && currentMonth >= 6) { // 本年7月到12月 代表本学年第二学期
     semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '2'
+  } else if (currentMonth <= 5 && currentMonth >= 1) {  // 本年2月到6月 代表本学年第一学期
+    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '1'
   } else { //本年1月 代表 上一学年的第二学期
     semester = (currentYear - 1).toString() + '-' + currentYear.toString() + '-' + '2'
   }
@@ -38,19 +38,21 @@ const init = () => {
   })
   time.value = items.value[0].value
   if (semester.substring(semester.length - 1) == '2') {
+    console.log(123)
     items.value.push({
       value: semester.substring(0, semester.length - 1) + '1',
       label: semester.substring(0, semester.length - 1) + '1'
     })
   }
   for (let i = 0; i < 10; i++) {
-    for (let j = 1; j < 3; j++) {
-      semester = (parseInt(semester.substring(0, 4)) - 1).toString() + '-'
-          + (parseInt(semester.substring(5, 9)) - 1).toString() + '-' + j.toString()
+    semester = (parseInt(semester.substring(0, 4)) - 1).toString() + '-'
+        + (parseInt(semester.substring(5, 9)) - 1).toString() + '-' + '2'
+    for (let j = 2; j > 0; j--) {
       items.value.push({
         value: semester,
         label: semester
       })
+      semester = semester.substring(0, semester.length-1) + '1'
     }
   }
   Get()
