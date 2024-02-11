@@ -51,7 +51,7 @@ const onChange = (page: number) => {
 }
 // 点击退选课
 const onClick = async (data: course) => {
-  await CurriculaVariable({id: data.id, selected: data.selected}).then(res=>{
+  await CurriculaVariable({id: data.id, selected: data.selected}).then(()=>{
     data.selected = !data.selected
   })
 

@@ -64,8 +64,7 @@ export const CourseInfo = async (data: paginate) => {
         params: data
     })
 }
-
-
+// 选课按钮
 export const CurriculaVariable = async (data: { id: number, selected: boolean }) => {
     return service({
         url: 'course/student-course',
@@ -74,3 +73,10 @@ export const CurriculaVariable = async (data: { id: number, selected: boolean })
     })
 }
 
+export const CurriculaVariableInfo = (data: { semester: string }) => {
+    return service({
+        url: 'course/student-course',
+        method: "get",
+        params: data
+    })
+}

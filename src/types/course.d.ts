@@ -11,3 +11,11 @@ export interface course {
     selected: boolean
     courseid: string | number
 }
+
+
+export interface EvaCourse {
+    course,
+    evaluate: number | null,
+    grade: number | null,
+    id: number
+}

@@ -1,56 +1,84 @@
 <script lang="ts" setup>
 import type {TableColumnsType} from 'ant-design-vue';
-import {ref} from "vue";
-const time = ref()
-const items = ref([
-    {
-      value:'1',
-      label: 'jack'
-    },
-  {
-    value:'2',
-    label: 'jack'
-  },
-  {
-    value:'3',
-    label: 'jack'
+import {onMounted, ref} from "vue";
+import {CurriculaVariableInfo} from "@/request/api";
+import type {course, EvaCourse} from "@/types/course";
+import {useStudentCourseStore} from "@/stores/StudentCourse";
+
+interface Semester {
+  value: string,
+  label: string
+}
+
+const data = ref<EvaCourse[] | null>()
+const time = ref<string>()
+const items = ref<Semester[]>([]);
+const studentCourseStore = useStudentCourseStore()
+const Get = () => {
+  CurriculaVariableInfo({semester: time.value as string}).then(res => {
+    studentCourseStore.addData(JSON.parse(JSON.stringify(res.data)), time.value as string)
+    data.value = studentCourseStore.getData(time.value as string)
+  })
+}
+const init = () => {
+  const currentMonth = new Date().getMonth()
+
+  const currentYear = new Date().getFullYear()
+  let semester
+  if (currentMonth <= 5 && currentMonth >= 1) { // 本年7月到12月 代表本学年第一学期
+    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '1'
+  } else if (currentMonth <= 11 && currentMonth >= 6) {  // 本年7月到12月 代表本学年第二学期
+    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '2'
+  } else { //本年1月 代表 上一学年的第二学期
+    semester = (currentYear - 1).toString() + '-' + currentYear.toString() + '-' + '2'
   }
-  ]);
+  items.value.push({
+    value: semester,
+    label: semester
+  })
+  time.value = items.value[0].value
+  if (semester.substring(semester.length - 1) == '2') {
+    items.value.push({
+      value: semester.substring(0, semester.length - 1) + '1',
+      label: semester.substring(0, semester.length - 1) + '1'
+    })
+  }
+  for (let i = 0; i < 10; i++) {
+    for (let j = 1; j < 3; j++) {
+      semester = (parseInt(semester.substring(0, 4)) - 1).toString() + '-'
+          + (parseInt(semester.substring(5, 9)) - 1).toString() + '-' + j.toString()
+      items.value.push({
+        value: semester,
+        label: semester
+      })
+    }
+  }
+  Get()
+}
+
+/*
+*  2023 - 2024 - 2    2023年 6  -  2024年 0
+*  2024 - 2025 - 1    2024年 1  -  2024年 5
+*  2024 - 2025 - 2    2024年 6  -  2025年 0
+*
+*
+* */
 const columns: TableColumnsType = [
-  {title: '课号', width: 100, dataIndex: 'courseid', key: 'courseid', fixed: 'left'},
-  {title: '课程名', width: 100, dataIndex: 'coursename', key: 'coursename', fixed: 'left'},
-  {title: '开课学院', dataIndex: 'college', key: 'college', width: 150},
-  {title: '任课教师', dataIndex: 'teachername', key: 'teachername', width: 150},
-  {title: '上课时间', dataIndex: 'coursetime', key: 'coursetime', width: 150},
-  {title: '开课学期', dataIndex: 'semester', key: 'semester', width: 150},
-  {title: 'Column 5', dataIndex: 'address', key: '5', width: 150},
-  {title: 'Column 6', dataIndex: 'address', key: '6', width: 150},
-  {title: 'Column 7', dataIndex: 'address', key: '7', width: 150},
-  {title: 'Column 8', dataIndex: 'address', key: '8'},
-  {
-    title: 'Action',
-    key: 'operation',
-    fixed: 'right',
-    width: 100,
-  },
+  {title: '课号', width: 100, dataIndex: ['course', 'courseid'], key: 'courseid', fixed: 'left'},
+  {title: '课程名', width: 100, dataIndex: ['course', 'coursename'], key: 'coursename', fixed: 'left'},
+  {title: '开课学院', dataIndex: ['course', 'collegename'], key: 'college', width: 150},
+  {title: '任课教师', dataIndex: ['course', 'teachername'], key: 'teachername', width: 150},
+  {title: '上课时间', dataIndex: ['course', 'coursetime'], key: 'coursetime', width: 200},
+  {title: '开课学期', dataIndex: ['course', 'semester'], key: 'semester', width: 150},
+  {title: '成绩', dataIndex: 'grade', key: 'grade', width: 150},
 ];
 
-interface DataItem {
-  key: number;
-  name: string;
-  age: number;
-  address: string;
+const onSubmit = () => {
+  console.log(time.value)
+  Get()
 }
 
-const data: DataItem[] = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    key: i,
-    name: `Edrward ${i}`,
-    age: 32,
-    address: `London Park no. ${i}`,
-  });
-}
+onMounted(init)
 </script>
 <template>
   <div>
@@ -80,7 +108,7 @@ for (let i = 0; i < 100; i++) {
           学期
         </a-col>
 
-        <a-col :span="8">
+        <a-col :span="5">
           <a-select
               v-model:value="time"
               style="width: 180px"
@@ -88,16 +116,23 @@ for (let i = 0; i < 100; i++) {
           />
         </a-col>
 
+
+        <a-col :span="3">
+          <a-button
+              style="width: 100px"
+              @click="onSubmit"
+          >
+            确定
+          </a-button>
+        </a-col>
       </a-row>
     </a-space>
-    <a-table :columns="columns" :data-source="data" :scroll="{ x: 1500, y: 500 }">
-      <template #bodyCell="{ column }">
-        <template v-if="column.key === 'operation'">
-          <a>action</a>
-        </template>
-      </template>
-    </a-table>
-
+    <a-table
+        :data-source="data"
+        :columns="columns"
+        :scroll="{ x: 1500, y: 1000 }"
+        hideOnSinglePage
+    />
   </div>
 </template>
 
