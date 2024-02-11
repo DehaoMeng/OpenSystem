@@ -11,6 +11,7 @@ import Header from "@/components/General/Header.vue";
 import {exit} from "@/utils/exit";
 import Slider from "@/components/General/Slider.vue";
 import {useUpdateMessageStore} from "@/stores/UpdateMessage";
+import {QuestionCircleOutlined} from "@ant-design/icons-vue";
 
 const messageStore = useMessageStore()
 const updateMessageStore = useUpdateMessageStore()
@@ -39,6 +40,16 @@ onBeforeMount(async ()=>{
         <RouterView/>
       </a-layout-content>
     </a-layout>
+    <a-tooltip placement="left">
+      <template #title>
+        <span>添加QQ好友联系管理员:1234567890</span>
+      </template>
+      <a-float-button>
+        <template #icon>
+          <QuestionCircleOutlined/>
+        </template>
+      </a-float-button>
+    </a-tooltip>
   </a-layout>
 </template>
 
