@@ -12,7 +12,6 @@ export const useStudentCourseStore =
             for (let i = 0; i < data.length; i++) {
                 data[i].course.courseid = GetCourseID(data[i].course.courseid as number)
             }
-            console.log(data)
             datas.value.push(data)
             addSemester(semester)
         }

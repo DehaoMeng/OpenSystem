@@ -2,7 +2,7 @@
 import type {TableColumnsType} from 'ant-design-vue';
 import {onMounted, ref} from "vue";
 import {CurriculaVariableInfo} from "@/request/api";
-import type {course, EvaCourse} from "@/types/course";
+import type {EvaCourse} from "@/types/course";
 import {useStudentCourseStore} from "@/stores/StudentCourse";
 
 interface Semester {
@@ -15,14 +15,17 @@ const time = ref<string>()
 const items = ref<Semester[]>([]);
 const studentCourseStore = useStudentCourseStore()
 const Get = () => {
+  if (studentCourseStore.getData(time.value as string) != null) {
+    data.value = studentCourseStore.getData(time.value as string)
+    return
+  }
   CurriculaVariableInfo({semester: time.value as string}).then(res => {
     studentCourseStore.addData(JSON.parse(JSON.stringify(res.data)), time.value as string)
     data.value = studentCourseStore.getData(time.value as string)
   })
 }
 const init = () => {
-  const currentMonth = 1
-  // const currentMonth = new Date().getMonth()
+  const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
   let semester
   if (currentMonth <= 11 && currentMonth >= 6) { // 本年7月到12月 代表本学年第二学期
@@ -38,7 +41,6 @@ const init = () => {
   })
   time.value = items.value[0].value
   if (semester.substring(semester.length - 1) == '2') {
-    console.log(123)
     items.value.push({
       value: semester.substring(0, semester.length - 1) + '1',
       label: semester.substring(0, semester.length - 1) + '1'
@@ -52,7 +54,7 @@ const init = () => {
         value: semester,
         label: semester
       })
-      semester = semester.substring(0, semester.length-1) + '1'
+      semester = semester.substring(0, semester.length - 1) + '1'
     }
   }
   Get()
@@ -76,7 +78,6 @@ const columns: TableColumnsType = [
 ];
 
 const onSubmit = () => {
-  console.log(time.value)
   Get()
 }
 
@@ -120,20 +121,26 @@ onMounted(init)
 
 
         <a-col :span="3">
-          <a-button
-              style="width: 100px"
-              @click="onSubmit"
-          >
-            确定
-          </a-button>
+          <a-tooltip placement="bottom">
+            <template #title>
+              <span>如对数据存在疑问请刷新页面或是联系管理员</span>
+            </template>
+            <a-button
+                style="width: 100px"
+                @click="onSubmit"
+            >
+              确定
+            </a-button>
+          </a-tooltip>
+
         </a-col>
       </a-row>
     </a-space>
     <a-table
         :data-source="data"
         :columns="columns"
+        :pagination="{hideOnSinglePage:true}"
         :scroll="{ x: 1500, y: 1000 }"
-        hideOnSinglePage
     />
   </div>
 </template>
