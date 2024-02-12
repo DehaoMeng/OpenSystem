@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type {TableColumnsType} from 'ant-design-vue';
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {CurriculaVariableInfo} from "@/request/api";
-import type {EvaCourse} from "@/types/course";
+import type {course, EvaCourse} from "@/types/course";
 import {useStudentCourseStore} from "@/stores/StudentCourse";
 
 interface Semester {
@@ -10,6 +10,8 @@ interface Semester {
   label: string
 }
 
+const courseid = ref()
+const coursename = ref()
 const data = ref<EvaCourse[] | null>()
 const time = ref<string>()
 const items = ref<Semester[]>([]);
@@ -57,16 +59,8 @@ const init = () => {
       semester = semester.substring(0, semester.length - 1) + '1'
     }
   }
-  Get()
 }
 
-/*
-*  2023 - 2024 - 2    2023年 6  -  2024年 0
-*  2024 - 2025 - 1    2024年 1  -  2024年 5
-*  2024 - 2025 - 2    2024年 6  -  2025年 0
-*
-*
-* */
 const columns: TableColumnsType = [
   {title: '课号', width: 100, dataIndex: ['course', 'courseid'], key: 'courseid', fixed: 'left'},
   {title: '课程名', width: 100, dataIndex: ['course', 'coursename'], key: 'coursename', fixed: 'left'},
@@ -77,9 +71,32 @@ const columns: TableColumnsType = [
   {title: '成绩', dataIndex: 'grade', key: 'grade', width: 150},
 ];
 
-const onSubmit = () => {
-  Get()
-}
+const filter_id = computed(() => {
+      let data = studentCourseStore.getData(time.value as string)
+      if (data != null) {
+        return data.filter(
+            (data: EvaCourse) =>
+                !courseid.value ||
+                data.course.courseid.toString().toLowerCase().includes(courseid.value.toLowerCase())
+        )
+      }
+      return null
+    }
+)
+// 搜索后的结果数据
+const filterTableData = computed(() => {
+  if ((courseid.value || coursename.value) && filter_id.value) {
+    let data = filter_id.value.filter(
+        (data: EvaCourse) =>
+            !coursename.value ||
+            data.course.coursename.toLowerCase().includes(coursename.value.toLowerCase())
+    )
+    return data
+  }
+  return studentCourseStore.getData(time.value as string)
+})
+
+watch(time, Get)
 
 onMounted(init)
 </script>
@@ -91,7 +108,7 @@ onMounted(init)
           课号
         </a-col>
         <a-col :span="4">
-          <a-input></a-input>
+          <a-input v-model:value="courseid"></a-input>
         </a-col>
         <a-col :span="1">
           <a-divider type="vertical" orientation="center" style="border-color: #7cb305;height: 80%; margin-top: 4px"/>
@@ -101,7 +118,7 @@ onMounted(init)
           课程名
         </a-col>
         <a-col :span="4">
-          <a-input></a-input>
+          <a-input v-model:value="coursename"></a-input>
         </a-col>
         <a-col>
           <a-divider type="vertical" orientation="center" style="border-color: #7cb305;height: 80%; margin-top: 4px"/>
@@ -112,32 +129,21 @@ onMounted(init)
         </a-col>
 
         <a-col :span="5">
-          <a-select
-              v-model:value="time"
-              style="width: 180px"
-              :options="items.map(item=>({value:item.value, label: item.label}))"
-          />
-        </a-col>
-
-
-        <a-col :span="3">
           <a-tooltip placement="bottom">
             <template #title>
               <span>如对数据存在疑问请刷新页面或是联系管理员</span>
             </template>
-            <a-button
-                style="width: 100px"
-                @click="onSubmit"
-            >
-              确定
-            </a-button>
+            <a-select
+                v-model:value="time"
+                style="width: 180px"
+                :options="items.map(item=>({value:item.value, label: item.label}))"
+            />
           </a-tooltip>
-
         </a-col>
       </a-row>
     </a-space>
     <a-table
-        :data-source="data"
+        :data-source="filterTableData"
         :columns="columns"
         :pagination="{hideOnSinglePage:true}"
         :scroll="{ x: 1500, y: 1000 }"
