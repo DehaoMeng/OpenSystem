@@ -2,19 +2,16 @@
 import type {TableColumnsType} from 'ant-design-vue';
 import {computed, onMounted, ref, watch} from "vue";
 import {CurriculaVariableInfo} from "@/request/api";
-import type {course, EvaCourse} from "@/types/course";
+import type {EvaCourse, Semester} from "@/types/course";
 import {useStudentCourseStore} from "@/stores/StudentCourse";
+import {initSemester} from "@/utils/semester";
 
-interface Semester {
-  value: string,
-  label: string
-}
+const items = ref<Semester[]>([]);
 
 const courseid = ref()
 const coursename = ref()
 const data = ref<EvaCourse[] | null>()
 const time = ref<string>()
-const items = ref<Semester[]>([]);
 const studentCourseStore = useStudentCourseStore()
 const Get = () => {
   if (studentCourseStore.getData(time.value as string) != null) {
@@ -27,38 +24,7 @@ const Get = () => {
   })
 }
 const init = () => {
-  const currentMonth = new Date().getMonth()
-  const currentYear = new Date().getFullYear()
-  let semester
-  if (currentMonth <= 11 && currentMonth >= 6) { // 本年7月到12月 代表本学年第二学期
-    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '2'
-  } else if (currentMonth <= 5 && currentMonth >= 1) {  // 本年2月到6月 代表本学年第一学期
-    semester = currentYear.toString() + '-' + (currentYear + 1).toString() + '-' + '1'
-  } else { //本年1月 代表 上一学年的第二学期
-    semester = (currentYear - 1).toString() + '-' + currentYear.toString() + '-' + '2'
-  }
-  items.value.push({
-    value: semester,
-    label: semester
-  })
-  time.value = items.value[0].value
-  if (semester.substring(semester.length - 1) == '2') {
-    items.value.push({
-      value: semester.substring(0, semester.length - 1) + '1',
-      label: semester.substring(0, semester.length - 1) + '1'
-    })
-  }
-  for (let i = 0; i < 10; i++) {
-    semester = (parseInt(semester.substring(0, 4)) - 1).toString() + '-'
-        + (parseInt(semester.substring(5, 9)) - 1).toString() + '-' + '2'
-    for (let j = 2; j > 0; j--) {
-      items.value.push({
-        value: semester,
-        label: semester
-      })
-      semester = semester.substring(0, semester.length - 1) + '1'
-    }
-  }
+  [time.value, items.value] = initSemester()
 }
 
 const columns: TableColumnsType = [
@@ -86,12 +52,11 @@ const filter_id = computed(() => {
 // 搜索后的结果数据
 const filterTableData = computed(() => {
   if ((courseid.value || coursename.value) && filter_id.value) {
-    let data = filter_id.value.filter(
+    return filter_id.value.filter(
         (data: EvaCourse) =>
             !coursename.value ||
             data.course.coursename.toLowerCase().includes(coursename.value.toLowerCase())
     )
-    return data
   }
   return studentCourseStore.getData(time.value as string)
 })
@@ -129,14 +94,14 @@ onMounted(init)
         </a-col>
 
         <a-col :span="5">
-          <a-tooltip placement="bottom">
+          <a-tooltip placement="right">
             <template #title>
               <span>如对数据存在疑问请刷新页面或是联系管理员</span>
             </template>
             <a-select
                 v-model:value="time"
                 style="width: 180px"
-                :options="items.map(item=>({value:item.value, label: item.label}))"
+                :options="items.map((item:Semester)=>({value:item.value, label: item.label}))"
             />
           </a-tooltip>
         </a-col>

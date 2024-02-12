@@ -19,3 +19,9 @@ export interface EvaCourse {
     grade: number | null,
     id: number
 }
+
+
+export interface Semester {
+    value: string,
+    label: string
+}
