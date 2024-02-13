@@ -38,3 +38,5 @@ npm run dev
 ```sh
 npm run build
 ```
+
+**PS: This project needs to be fully implemented in conjunction with the back-end project. At present, only some functions of the student end have been realized, and you can contact me if you have subsequent needs**
