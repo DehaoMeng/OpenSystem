@@ -6,22 +6,17 @@ This template should help get you started developing with Vue 3 in Vite.
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-## Type Support for `.vue` Imports in TS
+## Installation
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+If you want to use this project, you can use the git tool and type the following command in the terminal to download the project to your local machine
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+~~~bash
+git clone git@github.com:ITApeDeHao/OpenSystem.git
+~~~
 
 ## Project Setup
+
+After entering the project directory in the terminal. Enter the following command:
 
 ```sh
 npm install
@@ -40,3 +35,9 @@ npm run build
 ```
 
 **PS: This project needs to be fully implemented in conjunction with the back-end project. At present, only some functions of the student end have been realized, and you can contact me if you have subsequent needs**
+
+## Support
+
+This project is free of charge, if this project is helpful to you, I hope you can give recognition to the author
+
+![IMG_4884](https://www.kedaya.love/pic/202402191623521.jpeg)
