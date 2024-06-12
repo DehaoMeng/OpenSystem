@@ -38,6 +38,3 @@ npm run build
 
 ## Support
 
-This project is free of charge, if this project is helpful to you, I hope you can give recognition to the author
-
-![IMG_4884](https://www.kedaya.love/pic/202402191623521.jpeg)
